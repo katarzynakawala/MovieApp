@@ -138,18 +138,22 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	//pass updated movie record to Update method
+	//checking for race condition and writing to json 
 	err = app.models.Movies.Update(movie)
 	if err != nil {
-		app.serverErrorResponse(w, r, err)
+		switch {
+		case errors.Is(err, data.ErrEditConflict):
+			app.editConflictResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)	
+		}
 		return
 	}
 
-	//write json response
 	err = app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+    }
 }
 
 func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Request) {
