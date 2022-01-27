@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"os"
+	"sync"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -30,12 +31,12 @@ type config struct {
 		enabled bool
 	}
 	smtp struct {
-        host     string
-        port     int
-        username string
-        password string
-        sender   string
-    }
+		host     string
+		port     int
+		username string
+		password string
+		sender   string
+	}
 }
 
 type application struct {
@@ -43,6 +44,7 @@ type application struct {
 	logger *jsonlog.Logger
 	models data.Models
 	mailer mailer.Mailer
+	wg     sync.WaitGroup
 }
 
 func main() {
@@ -58,14 +60,14 @@ func main() {
 	flag.StringVar(&cfg.db.maxIdleTime, "db-max-idle-time", "15m", "PostgreSQL max connection idle time")
 
 	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", 2, "Rate limiter maximum requests per second")
-    flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limiter maximum burst")
-    flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
+	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limiter maximum burst")
+	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
 	flag.StringVar(&cfg.smtp.host, "smtp-host", "smtp.mailtrap.io", "SMTP host")
-    flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
-    flag.StringVar(&cfg.smtp.username, "smtp-username", "d1e71b1b92441d", "SMTP username")
-    flag.StringVar(&cfg.smtp.password, "smtp-password", "00a723bbe5d941", "SMTP password")
-    flag.StringVar(&cfg.smtp.sender, "smtp-sender", "MovieApp <no-reply@movieapp.kkawala.net>", "SMTP sender")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "d1e71b1b92441d", "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "00a723bbe5d941", "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "MovieApp <no-reply@movieapp.kkawala.net>", "SMTP sender")
 
 	flag.Parse()
 
