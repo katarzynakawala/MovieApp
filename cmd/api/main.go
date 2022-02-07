@@ -76,9 +76,9 @@ func main() {
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "MovieApp <no-reply@movieapp.kkawala.net>", "SMTP sender")
 
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
-        cfg.cors.trustedOrigins = strings.Fields(val)
-        return nil
-    })
+		cfg.cors.trustedOrigins = strings.Fields(val)
+		return nil
+	})
 
 	flag.Parse()
 

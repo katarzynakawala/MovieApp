@@ -108,7 +108,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 			v.AddError("token", "invalid or expired activation token")
 			app.failedValidationResponse(w, r, v.Errors)
 		default:
-			app.serverErrorResponse(w, r, err)	
+			app.serverErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -121,7 +121,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		case errors.Is(err, data.ErrEditConflict):
 			app.editConflictResponse(w, r)
 		default:
-			app.serverErrorResponse(w, r, err)	
+			app.serverErrorResponse(w, r, err)
 		}
 		return
 	}

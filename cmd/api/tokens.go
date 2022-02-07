@@ -11,7 +11,7 @@ import (
 
 func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		Email string `json:"email"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
@@ -37,7 +37,7 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 		case errors.Is(err, data.ErrRecordNotFound):
 			app.invalidCredentialsResponse(w, r)
 		default:
-			app.serverErrorResponse(w, r, err)		
+			app.serverErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -54,13 +54,13 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 	}
 
 	token, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.ScopeAuthentication)
-    if err != nil {
-        app.serverErrorResponse(w, r, err)
-        return
-    }
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 
 	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token}, nil)
-    if err != nil {
-        app.serverErrorResponse(w, r, err)
-    }
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }
