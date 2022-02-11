@@ -90,3 +90,11 @@ production_host_ip = '159.89.14.46'
 .PHONY: production/connect
 production/connect:
 	ssh movieapp@${production_host_ip}
+
+
+## production/deploy/api: deploy the api to production
+.PHONY: production/deploy/api
+production/deploy/api:
+	rsync -P ./bin/linux_amd64/api movieapp@${production_host_ip}:~
+	rsync -rP --delete ./migrations movieapp@${production_host_ip}:~
+	ssh -t movieapp@${production_host_ip} 'migrate -path ~/migrations -database $$MOVIEAPP_DB_DSN up'
