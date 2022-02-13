@@ -1,0 +1,23 @@
+[Unit]
+Description=MovieApp API service
+
+After=postgresql.service
+After=network-online.target
+Wants=network-online.target
+
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+[Service]
+Type=exec
+User=movieapp
+Group=movieapp
+EnvironmentFile=/etc/environment
+WorkingDirectory=/home/movieapp
+ExecStart=/home/movieapp/api -port=4000 -db-dsn=${MOVIEAPP_DB_DSN} -env=production
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
