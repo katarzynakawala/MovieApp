@@ -101,6 +101,28 @@ func (app *application) createPasswordResetTokenHandler(w http.ResponseWriter, r
         return
     }
 
+	token, err := app.models.Tokens.New(user.ID, 45*time.Minute, data.ScopePasswordReset)
+    if err != nil {
+        app.serverErrorResponse(w, r, err)
+        return
+    }
+
+	app.background(func() {
+        data := map[string]interface{}{
+            "passwordResetToken": token.Plaintext,
+        }
+
+	err = app.mailer.Send(user.Email, "token_password_reset.tmpl", data)
+    if err != nil {
+        app.logger.PrintError(err, nil)
+    }
+})
+
+env := envelope{"message": "an email will be sent to you containing password reset instructions"}
 
 
+err = app.writeJSON(w, http.StatusAccepted, env, nil)
+if err != nil {
+	app.serverErrorResponse(w, r, err)
+}
 }
