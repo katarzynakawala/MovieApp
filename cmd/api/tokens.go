@@ -124,5 +124,5 @@ env := envelope{"message": "an email will be sent to you containing password res
 err = app.writeJSON(w, http.StatusAccepted, env, nil)
 if err != nil {
 	app.serverErrorResponse(w, r, err)
-}
+	}
 }
